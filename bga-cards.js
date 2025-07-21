@@ -34,9 +34,9 @@ function attachWithAnimation(animationManager, animation) {
     var _a;
     var settings = animation.settings;
     var element = settings.animation.settings.element;
-    var fromRect = element.getBoundingClientRect();
+    var fromRect = animationManager.game.getBoundingClientRectIgnoreZoom(element);
     settings.animation.settings.fromRect = fromRect;
-    settings.attachElement.appendChild(element);
+    settings.attachElement.insertAdjacentElement(settings.where, element);
     (_a = settings.afterAttach) === null || _a === void 0 ? void 0 : _a.call(settings, element, settings.attachElement);
     return animationManager.play(settings.animation);
 }
@@ -77,10 +77,10 @@ var BgaCumulatedAnimation = /** @class */ (function (_super) {
  */
 function slideAnimation(animationManager, animation) {
     var promise = new Promise(function (success) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f;
         var settings = animation.settings;
         var element = settings.element;
-        var _f = getDeltaCoordinates(element, settings), x = _f.x, y = _f.y;
+        var _g = getDeltaCoordinates(element, settings, animationManager), x = _g.x, y = _g.y;
         var duration = (_a = settings.duration) !== null && _a !== void 0 ? _a : 500;
         var originalZIndex = element.style.zIndex;
         var originalTransition = element.style.transition;
@@ -88,7 +88,12 @@ function slideAnimation(animationManager, animation) {
         element.style.zIndex = "".concat((_c = settings === null || settings === void 0 ? void 0 : settings.zIndex) !== null && _c !== void 0 ? _c : 10);
         element.style.transition = null;
         element.offsetHeight;
-        element.style.transform = "translate(".concat(-x, "px, ").concat(-y, "px) rotate(").concat((_d = settings === null || settings === void 0 ? void 0 : settings.rotationDelta) !== null && _d !== void 0 ? _d : 0, "deg)");
+        if ((settings === null || settings === void 0 ? void 0 : settings.rotationDelta) === 90) {
+            element.style.transform = "translate(".concat(y, "px, ").concat(-x, "px) rotate(").concat((_d = settings === null || settings === void 0 ? void 0 : settings.rotationDelta) !== null && _d !== void 0 ? _d : 0, "deg)");
+        }
+        else {
+            element.style.transform = "translate(".concat(-x, "px, ").concat(-y, "px) rotate(").concat((_e = settings === null || settings === void 0 ? void 0 : settings.rotationDelta) !== null && _e !== void 0 ? _e : 0, "deg)");
+        }
         var timeoutId = null;
         var cleanOnTransitionEnd = function () {
             element.style.zIndex = originalZIndex;
@@ -115,7 +120,7 @@ function slideAnimation(animationManager, animation) {
         element.offsetHeight;
         element.style.transition = "transform ".concat(duration, "ms ").concat(transitionTimingFunction);
         element.offsetHeight;
-        element.style.transform = (_e = settings === null || settings === void 0 ? void 0 : settings.finalTransform) !== null && _e !== void 0 ? _e : null;
+        element.style.transform = (_f = settings === null || settings === void 0 ? void 0 : settings.finalTransform) !== null && _f !== void 0 ? _f : null;
         // safety in case transitionend and transitioncancel are not called
         timeoutId = setTimeout(cleanOnTransitionEnd, duration + 100);
     });
@@ -140,7 +145,7 @@ function slideToAnimation(animationManager, animation) {
         var _a, _b, _c, _d, _e;
         var settings = animation.settings;
         var element = settings.element;
-        var _f = getDeltaCoordinates(element, settings), x = _f.x, y = _f.y;
+        var _f = getDeltaCoordinates(element, settings, animationManager), x = _f.x, y = _f.y;
         var duration = (_a = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _a !== void 0 ? _a : 500;
         var originalZIndex = element.style.zIndex;
         var originalTransition = element.style.transition;
@@ -218,7 +223,7 @@ function shouldAnimate(settings) {
  * @param settings an `AnimationSettings` object
  * @returns a promise when animation ends
  */
-function getDeltaCoordinates(element, settings) {
+function getDeltaCoordinates(element, settings, animationManager) {
     var _a;
     if (!settings.fromDelta && !settings.fromRect && !settings.fromElement) {
         throw new Error("[bga-animation] fromDelta, fromRect or fromElement need to be set");
@@ -230,11 +235,11 @@ function getDeltaCoordinates(element, settings) {
         y = settings.fromDelta.y;
     }
     else {
-        var originBR = (_a = settings.fromRect) !== null && _a !== void 0 ? _a : settings.fromElement.getBoundingClientRect();
+        var originBR = (_a = settings.fromRect) !== null && _a !== void 0 ? _a : animationManager.game.getBoundingClientRectIgnoreZoom(settings.fromElement);
         // TODO make it an option ?
         var originalTransform = element.style.transform;
         element.style.transform = '';
-        var destinationBR = element.getBoundingClientRect();
+        var destinationBR = animationManager.game.getBoundingClientRectIgnoreZoom(element);
         element.style.transform = originalTransform;
         x = (destinationBR.left + destinationBR.right) / 2 - (originBR.left + originBR.right) / 2;
         y = (destinationBR.top + destinationBR.bottom) / 2 - (originBR.top + originBR.bottom) / 2;
@@ -249,7 +254,7 @@ function logAnimation(animationManager, animation) {
     var settings = animation.settings;
     var element = settings.element;
     if (element) {
-        console.log(animation, settings, element, element.getBoundingClientRect(), element.style.transform);
+        console.log(animation, settings, element, element.getBoundingClientRect(), animationManager.game.getBoundingClientRectIgnoreZoom(element), element.style.transform);
     }
     else {
         console.log(animation, settings);
@@ -277,8 +282,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -354,24 +359,24 @@ var AnimationManager = /** @class */ (function () {
      * @returns the animation promise.
      */
     AnimationManager.prototype.play = function (animation) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         return __awaiter(this, void 0, void 0, function () {
-            var settings, _r;
+            var settings, _a;
+            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
             return __generator(this, function (_s) {
                 switch (_s.label) {
                     case 0:
                         animation.played = animation.playWhenNoAnimation || this.animationsActive();
                         if (!animation.played) return [3 /*break*/, 2];
                         settings = animation.settings;
-                        (_a = settings.animationStart) === null || _a === void 0 ? void 0 : _a.call(settings, animation);
-                        (_b = settings.element) === null || _b === void 0 ? void 0 : _b.classList.add((_c = settings.animationClass) !== null && _c !== void 0 ? _c : 'bga-animations_animated');
-                        animation.settings = __assign({ duration: (_g = (_e = (_d = animation.settings) === null || _d === void 0 ? void 0 : _d.duration) !== null && _e !== void 0 ? _e : (_f = this.settings) === null || _f === void 0 ? void 0 : _f.duration) !== null && _g !== void 0 ? _g : 500, scale: (_l = (_j = (_h = animation.settings) === null || _h === void 0 ? void 0 : _h.scale) !== null && _j !== void 0 ? _j : (_k = this.zoomManager) === null || _k === void 0 ? void 0 : _k.zoom) !== null && _l !== void 0 ? _l : undefined }, animation.settings);
-                        _r = animation;
+                        (_b = settings.animationStart) === null || _b === void 0 ? void 0 : _b.call(settings, animation);
+                        (_c = settings.element) === null || _c === void 0 ? void 0 : _c.classList.add((_d = settings.animationClass) !== null && _d !== void 0 ? _d : 'bga-animations_animated');
+                        animation.settings = __assign({ duration: (_h = (_f = (_e = animation.settings) === null || _e === void 0 ? void 0 : _e.duration) !== null && _f !== void 0 ? _f : (_g = this.settings) === null || _g === void 0 ? void 0 : _g.duration) !== null && _h !== void 0 ? _h : 500, scale: (_m = (_k = (_j = animation.settings) === null || _j === void 0 ? void 0 : _j.scale) !== null && _k !== void 0 ? _k : (_l = this.zoomManager) === null || _l === void 0 ? void 0 : _l.zoom) !== null && _m !== void 0 ? _m : undefined }, animation.settings);
+                        _a = animation;
                         return [4 /*yield*/, animation.animationFunction(this, animation)];
                     case 1:
-                        _r.result = _s.sent();
-                        (_o = (_m = animation.settings).animationEnd) === null || _o === void 0 ? void 0 : _o.call(_m, animation);
-                        (_p = settings.element) === null || _p === void 0 ? void 0 : _p.classList.remove((_q = settings.animationClass) !== null && _q !== void 0 ? _q : 'bga-animations_animated');
+                        _a.result = _s.sent();
+                        (_p = (_o = animation.settings).animationEnd) === null || _p === void 0 ? void 0 : _p.call(_o, animation);
+                        (_q = settings.element) === null || _q === void 0 ? void 0 : _q.classList.remove((_r = settings.animationClass) !== null && _r !== void 0 ? _r : 'bga-animations_animated');
                         return [3 /*break*/, 3];
                     case 2: return [2 /*return*/, Promise.resolve(animation)];
                     case 3: return [2 /*return*/];
@@ -730,11 +735,11 @@ var CardStock = /** @class */ (function () {
      * @param settings a `AddCardSettings` object
      * @param shift if number, the number of milliseconds between each card. if true, chain animations
      */
-    CardStock.prototype.addCards = function (cards, animation, settings, shift) {
-        if (shift === void 0) { shift = false; }
-        return __awaiter(this, void 0, void 0, function () {
+    CardStock.prototype.addCards = function (cards_1, animation_1, settings_1) {
+        return __awaiter(this, arguments, void 0, function (cards, animation, settings, shift) {
             var promises, result, others, _loop_2, i, results;
             var _this = this;
+            if (shift === void 0) { shift = false; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -1006,9 +1011,9 @@ var CardStock = /** @class */ (function () {
      * @param fromElement The HTMLElement to animate from.
      */
     CardStock.prototype.animationFromElement = function (element, fromRect, settings) {
-        var _a;
         return __awaiter(this, void 0, void 0, function () {
             var side, cardSides_1, animation, result;
+            var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -1245,9 +1250,9 @@ var Deck = /** @class */ (function (_super) {
         _super.prototype.cardRemoved.call(this, card, settings);
     };
     Deck.prototype.removeAll = function (settings) {
-        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
             var promise;
+            var _a, _b;
             return __generator(this, function (_c) {
                 promise = _super.prototype.removeAll.call(this, __assign(__assign({}, settings), { autoUpdateCardNumber: (_a = settings === null || settings === void 0 ? void 0 : settings.autoUpdateCardNumber) !== null && _a !== void 0 ? _a : false }));
                 if ((_b = settings === null || settings === void 0 ? void 0 : settings.autoUpdateCardNumber) !== null && _b !== void 0 ? _b : true) {
@@ -1269,10 +1274,10 @@ var Deck = /** @class */ (function (_super) {
      * @returns promise when animation ends
      */
     Deck.prototype.shuffle = function (settings) {
-        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function () {
             var animatedCardsMax, animatedCards, elements, getFakeCard, uid, i, newCard, newElement, pauseDelayAfterAnimation;
             var _this = this;
+            var _a, _b, _c;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:

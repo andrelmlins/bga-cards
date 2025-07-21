@@ -91,6 +91,7 @@ interface BgaAttachWithAnimationSettings extends BgaElementAnimationSettings {
      * The target to attach the element to.
      */
     attachElement: HTMLElement;
+    where: InsertPosition;
     /**
      * A function called after attaching the element.
      */
@@ -161,7 +162,7 @@ declare function shouldAnimate(settings?: BgaAnimationSettings): boolean;
  * @param settings an `AnimationSettings` object
  * @returns a promise when animation ends
  */
-declare function getDeltaCoordinates(element: HTMLElement, settings: BgaAnimationWithOriginSettings): {
+declare function getDeltaCoordinates(element: HTMLElement, settings: BgaAnimationWithOriginSettings, animationManager: AnimationManager): {
     x: number;
     y: number;
 };
