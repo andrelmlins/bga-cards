@@ -263,6 +263,7 @@ class CardStock<T> {
 
     protected moveFromOtherStock(card: T, cardElement: HTMLElement, animation: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
         let promise: Promise<boolean>;
+        const rotationDelta = cardElement.dataset.rotate === 'true' ? 180 : 0;
 
         const element = animation.fromStock.contains(card) ? this.manager.getCardElement(card) : animation.fromStock.element;
         const fromRect = element?.getBoundingClientRect();
@@ -273,7 +274,7 @@ class CardStock<T> {
 
         promise = fromRect ? this.animationFromElement(cardElement, fromRect, {
             originalSide: animation.originalSide, 
-            rotationDelta: animation.rotationDelta,
+            rotationDelta: rotationDelta,
             animation: animation.animation,
         }) : Promise.resolve(false);
         // in the case the card was move inside the same stock we don't remove it
@@ -600,7 +601,7 @@ class CardStock<T> {
             animation.settings.element = element;
             (animation.settings as BgaAnimationWithOriginSettings).fromRect = fromRect;
         } else {
-            animation = new BgaSlideAnimation({ element, fromRect });
+            animation = new BgaSlideAnimation({ element, fromRect, rotationDelta: settings.rotationDelta });
         }
 
         const result = await this.manager.animationManager.play(animation);

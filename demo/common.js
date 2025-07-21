@@ -3,15 +3,15 @@ let game = {
     document.getElementById(divId).title = tooltip;
   },
 
-  getBoundingClientRectIgnoreZoom: (element) => {
-    var rect = element.getBoundingClientRect();
-    var zoomCorr = 1;
-    rect.x /= zoomCorr;
-    rect.y /= zoomCorr;
-    rect.width /= zoomCorr;
-    rect.height /= zoomCorr;
-    return rect;
-  },
+  //   getBoundingClientRectIgnoreZoom: (element) => {
+  //     var rect = element.getBoundingClientRect();
+  //     var zoomCorr = 1;
+  //     rect.x /= zoomCorr;
+  //     rect.y /= zoomCorr;
+  //     rect.width /= zoomCorr;
+  //     rect.height /= zoomCorr;
+  //     return rect;
+  //   },
 };
 
 function initCommon() {

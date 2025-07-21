@@ -13,6 +13,10 @@ body > .card {
         }
     }
 
+    &[data-rotate="true"] {
+        transform: rotate(180deg);
+    }
+
     .card-sides {
         position: absolute;
         top: 0;

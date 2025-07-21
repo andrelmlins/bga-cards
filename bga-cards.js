@@ -235,6 +235,7 @@ function getDeltaCoordinates(element, settings, animationManager) {
         y = settings.fromDelta.y;
     }
     else {
+        console.log(settings);
         var originBR = (_a = settings.fromRect) !== null && _a !== void 0 ? _a : animationManager.game.getBoundingClientRectIgnoreZoom(settings.fromElement);
         // TODO make it an option ?
         var originalTransform = element.style.transform;
@@ -679,13 +680,14 @@ var CardStock = /** @class */ (function () {
     };
     CardStock.prototype.moveFromOtherStock = function (card, cardElement, animation, settings) {
         var promise;
+        var rotationDelta = cardElement.dataset.rotate === 'true' ? 180 : 0;
         var element = animation.fromStock.contains(card) ? this.manager.getCardElement(card) : animation.fromStock.element;
         var fromRect = element === null || element === void 0 ? void 0 : element.getBoundingClientRect();
         this.addCardElementToParent(cardElement, settings);
         this.removeSelectionClassesFromElement(cardElement);
         promise = fromRect ? this.animationFromElement(cardElement, fromRect, {
             originalSide: animation.originalSide,
-            rotationDelta: animation.rotationDelta,
+            rotationDelta: rotationDelta,
             animation: animation.animation,
         }) : Promise.resolve(false);
         // in the case the card was move inside the same stock we don't remove it
@@ -1033,7 +1035,7 @@ var CardStock = /** @class */ (function () {
                             animation.settings.fromRect = fromRect;
                         }
                         else {
-                            animation = new BgaSlideAnimation({ element: element, fromRect: fromRect });
+                            animation = new BgaSlideAnimation({ element: element, fromRect: fromRect, rotationDelta: settings.rotationDelta });
                         }
                         return [4 /*yield*/, this.manager.animationManager.play(animation)];
                     case 1:
@@ -1802,6 +1804,7 @@ var CardManager = /** @class */ (function () {
         var element = document.createElement("div");
         element.id = id;
         element.dataset.side = '' + side;
+        element.dataset.rotate = '' + (card.rotate ? true : false);
         element.innerHTML = "\n            <div class=\"card-sides\">\n                <div id=\"".concat(id, "-front\" class=\"card-side front\">\n                </div>\n                <div id=\"").concat(id, "-back\" class=\"card-side back\">\n                </div>\n            </div>\n        ");
         element.classList.add('card');
         document.body.appendChild(element);
@@ -1873,6 +1876,7 @@ var CardManager = /** @class */ (function () {
         }
         var isVisible = visible !== null && visible !== void 0 ? visible : this.isCardVisible(card);
         element.dataset.side = isVisible ? 'front' : 'back';
+        element.dataset.rotate = '' + (card.rotate ? true : false);
         var stringId = JSON.stringify(this.getId(card));
         if ((_a = settings === null || settings === void 0 ? void 0 : settings.updateMain) !== null && _a !== void 0 ? _a : false) {
             if (this.updateMainTimeoutId[stringId]) { // make sure there is not a delayed animation that will overwrite the last flip request

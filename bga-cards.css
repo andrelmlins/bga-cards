@@ -10,6 +10,9 @@ body > .card {
 .card[data-side=back] .card-sides {
   transform: rotateY(180deg);
 }
+.card[data-rotate=true] {
+  transform: rotate(180deg);
+}
 .card .card-sides {
   position: absolute;
   top: 0;
@@ -102,6 +105,9 @@ body > .card {
 }
 .card-stock.hand-stock .card:not(:first-child) {
   margin-left: calc(-1 * var(--card-overlap));
+}
+.card-stock.hand-stock .card[data-rotate=true] {
+  transform: translateY(calc(var(--card-shift) * var(--hand-stock-middle-index-abs))) rotate(calc(180deg + var(--hand-stock-middle-index) * var(--card-inclination)));
 }
 
 .card-stock.manual-position-stock {

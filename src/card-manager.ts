@@ -195,6 +195,7 @@ class CardManager<T> {
         const element = document.createElement("div");
         element.id = id;
         element.dataset.side = ''+side;
+        element.dataset.rotate = ''+((card as any).rotate ? true : false);
         element.innerHTML = `
             <div class="card-sides">
                 <div id="${id}-front" class="card-side front">
@@ -279,6 +280,7 @@ class CardManager<T> {
         const isVisible = visible ?? this.isCardVisible(card);
 
         element.dataset.side = isVisible ? 'front' : 'back';
+        element.dataset.rotate = ''+((card as any).rotate ? true : false);
 
         const stringId = JSON.stringify(this.getId(card));
         
