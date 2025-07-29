@@ -20,6 +20,8 @@ interface CardStockSettings {
      * The class to apply to selected cards. Use class from manager is unset.
      */
     selectedCardClass?: string | null;
+
+    rotateMap?: Record<string,number>;
 }
 
 interface AddCardSettings {
@@ -263,7 +265,7 @@ class CardStock<T> {
 
     protected moveFromOtherStock(card: T, cardElement: HTMLElement, animation: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
         let promise: Promise<boolean>;
-        const rotationDelta = cardElement.dataset.rotate === 'true' ? 180 : 0;
+        const rotationDelta = this.settings.rotateMap[cardElement.dataset.rotate];
 
         const element = animation.fromStock.contains(card) ? this.manager.getCardElement(card) : animation.fromStock.element;
         const fromRect = element?.getBoundingClientRect();

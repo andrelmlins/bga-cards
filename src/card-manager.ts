@@ -195,7 +195,15 @@ class CardManager<T> {
         const element = document.createElement("div");
         element.id = id;
         element.dataset.side = ''+side;
-        element.dataset.rotate = ''+((card as any).rotate ? true : false);
+        
+        if((card as any).rotate == true){
+            element.dataset.rotate = 'true';
+        } else if(typeof (card as any).rotate === 'string'){
+            element.dataset.rotate = (card as any).rotate;
+        } else {
+            element.dataset.rotate = 'false';
+        }
+        
         element.innerHTML = `
             <div class="card-sides">
                 <div id="${id}-front" class="card-side front">
