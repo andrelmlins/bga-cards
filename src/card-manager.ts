@@ -196,9 +196,9 @@ class CardManager<T> {
         element.id = id;
         element.dataset.side = ''+side;
         
-        if((card as any).rotate == true){
+        if((card as any).rotate == true) {
             element.dataset.rotate = 'true';
-        } else if(typeof (card as any).rotate === 'string'){
+        } else if(typeof (card as any).rotate == 'string' && (card as any).rotate.length != '') {
             element.dataset.rotate = (card as any).rotate;
         } else {
             element.dataset.rotate = 'false';
@@ -288,7 +288,14 @@ class CardManager<T> {
         const isVisible = visible ?? this.isCardVisible(card);
 
         element.dataset.side = isVisible ? 'front' : 'back';
-        element.dataset.rotate = ''+((card as any).rotate ? true : false);
+        
+        if((card as any).rotate == true) {
+            element.dataset.rotate = 'true';
+        } else if(typeof (card as any).rotate == 'string' && (card as any).rotate.length != '') {
+            element.dataset.rotate = (card as any).rotate;
+        } else {
+            element.dataset.rotate = 'false';
+        }
 
         const stringId = JSON.stringify(this.getId(card));
         
