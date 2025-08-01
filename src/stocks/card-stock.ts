@@ -265,7 +265,7 @@ class CardStock<T> {
 
     protected moveFromOtherStock(card: T, cardElement: HTMLElement, animation: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
         let promise: Promise<boolean>;
-        const rotationDelta = this.settings.rotationVariant ? this.settings.rotationVariant[cardElement.dataset.rotate] : 0;
+        const rotationDelta = this.settings?.rotationVariant ? this.settings.rotationVariant[cardElement.dataset.rotate] : 0;
 
         const element = animation.fromStock.contains(card) ? this.manager.getCardElement(card) : animation.fromStock.element;
         const fromRect = element?.getBoundingClientRect();
