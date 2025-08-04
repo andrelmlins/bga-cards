@@ -276,7 +276,7 @@ class CardStock<T> {
 
         promise = fromRect ? this.animationFromElement(cardElement, fromRect, {
             originalSide: animation.originalSide, 
-            rotationDelta: rotationDelta,
+            rotationDelta: animation.rotationDelta ??rotationDelta,
             animation: animation.animation,
         }) : Promise.resolve(false);
         // in the case the card was move inside the same stock we don't remove it
@@ -294,6 +294,7 @@ class CardStock<T> {
 
     protected moveFromElement(card: T, cardElement: HTMLElement, animation: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
         let promise: Promise<boolean>;
+        const rotationDelta = this.settings?.rotationVariant ? this.settings.rotationVariant[cardElement.dataset.rotate] : 0;
 
         this.addCardElementToParent(cardElement, settings);
     
@@ -301,14 +302,14 @@ class CardStock<T> {
             if (animation.fromStock) {
                 promise = this.animationFromElement(cardElement, animation.fromStock.element.getBoundingClientRect(), {
                     originalSide: animation.originalSide, 
-                    rotationDelta: animation.rotationDelta,
+                    rotationDelta: animation.rotationDelta ?? rotationDelta,
                     animation: animation.animation,
                 });
                 animation.fromStock.removeCard(card);
             } else if (animation.fromElement) {
                 promise = this.animationFromElement(cardElement,  animation.fromElement.getBoundingClientRect(), {
                     originalSide: animation.originalSide, 
-                    rotationDelta: animation.rotationDelta,
+                    rotationDelta: animation.rotationDelta ?? rotationDelta,
                     animation: animation.animation,
                 });
             }
