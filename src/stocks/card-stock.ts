@@ -278,6 +278,7 @@ class CardStock<T> {
             originalSide: animation.originalSide, 
             rotationDelta: animation.rotationDelta ??rotationDelta,
             animation: animation.animation,
+            scale: animation.scale,
         }) : Promise.resolve(false);
         // in the case the card was move inside the same stock we don't remove it
         if (animation.fromStock && animation.fromStock != this) {
@@ -604,7 +605,7 @@ class CardStock<T> {
             animation.settings.element = element;
             (animation.settings as BgaAnimationWithOriginSettings).fromRect = fromRect;
         } else {
-            animation = new BgaSlideAnimation({ element, fromRect, rotationDelta: settings.rotationDelta });
+            animation = new BgaSlideAnimation({ element, fromRect, rotationDelta: settings.rotationDelta, scale: settings.scale });
         }
 
         const result = await this.manager.animationManager.play(animation);

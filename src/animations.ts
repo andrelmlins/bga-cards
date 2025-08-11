@@ -23,6 +23,8 @@ interface CardAnimation<T> {
      * An animation function, that return a Promise at the end of animation (the promise returns true if animation ended, false otherwise)
      */
     animation?: BgaAnimation<BgaElementAnimationSettings>;
+
+    scale?: number;
 }
 
 interface CardAnimationSettings {
@@ -41,4 +43,6 @@ interface CardAnimationSettings {
      * An animation function, that return a Promise at the end of animation (the promise returns true if animation ended, false otherwise)
      */
     animation?: BgaAnimation<BgaElementAnimationSettings>;
+
+    scale?: number,
 }
