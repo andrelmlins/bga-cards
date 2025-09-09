@@ -46,6 +46,8 @@ interface AddCardSettings {
      * Set if the card is selectable. Default is true, but will be ignored if the stock is not selectable.
      */
     selectable?: boolean;
+
+    canReAdd?: boolean;
 }
 
 interface RemoveCardSettings {
@@ -151,6 +153,10 @@ class CardStock<T> {
      * @returns if the card can be added
      */
     protected canAddCard(card: T, settings?: AddCardSettings) {
+        if(settings?.canReAdd){
+            return true;
+        }
+
         return !this.contains(card);
     }
 
@@ -172,6 +178,7 @@ class CardStock<T> {
         // we check if card is in a stock
         const originStock = this.manager.getCardStock(card);
 
+        const oldIndex = this.cards.findIndex(c => this.manager.getId(c) == this.manager.getId(card));
         const index = this.getNewCardIndex(card);
         const settingsWithIndex: AddCardSettings = {
             index,
@@ -215,7 +222,13 @@ class CardStock<T> {
         }
 
         if (settingsWithIndex.index !== null && settingsWithIndex.index !== undefined) {
-            this.cards.splice(index, 0, card);
+            if(oldIndex !== -1){
+                this.cards.splice(oldIndex, 1);
+                this.cards.splice(oldIndex < index ? index - 1 : index, 0, card);
+            } else {
+                this.cards.splice(index, 0, card);
+            }
+            
         } else {
             this.cards.push(card);
         }
